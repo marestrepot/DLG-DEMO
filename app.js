@@ -32,28 +32,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 let validCommunities = [];
 
                 data.forEach(row => {
-                    // Validar que tenga nombre de la comunidad
-                    if (row['Nombre de la Comunidad']) {
-                        const est = parseInt(row['Estimado']) || 0;
-                        totalMembers += est;
+                    try {
+                        // Validar que tenga nombre de la comunidad
+                        if (row['Nombre de la Comunidad'] && row['Nombre de la Comunidad'].trim() !== '') {
+                            const estTxt = row['Estimado'] ? row['Estimado'].toString().replace(/,/g, '') : '0';
+                            const est = parseInt(estTxt) || 0;
+                            totalMembers += est;
 
-                        // Encontrar coordenadas
-                        const country = row['País'] ? row['País'].trim() : "";
-                        const coords = countryCoords[country] || [-50, 20]; // Default Atlántico central si no se encuentra
+                            // Encontrar coordenadas
+                            const country = row['País'] ? row['País'].trim() : "Desconocido";
+                            const coords = countryCoords[country] || [-50, 20]; // Default Atlántico central si no se encuentra
 
-                        // Extraemos datos según las columnas devueltas
-                        validCommunities.push({
-                            name: row['Nombre de la Comunidad'],
-                            country: country,
-                            scope: row['Alcance'] || 'N/A',
-                            platform: row['Plataforma Principal'] || 'N/A',
-                            estimated: est,
-                            frequency: row['Frecuencia de Eventos'] || 'N/A',
-                            specialty: row['Especialidad'] || 'N/A',
-                            // La columna de líder puede o no venir en este tab. Usamos fallback si existe.
-                            leader: row['Lider'] || row['Líder'] || 'No especificado',
-                            coords: coords
-                        });
+                            // Extraemos datos según las columnas devueltas
+                            validCommunities.push({
+                                name: row['Nombre de la Comunidad'].trim(),
+                                country: country,
+                                scope: row['Alcance'] || 'N/A',
+                                platform: row['Plataforma Principal'] || 'N/A',
+                                estimated: est,
+                                frequency: row['Frecuencia de Eventos'] || 'N/A',
+                                specialty: row['Especialidad'] || 'N/A',
+                                // La columna de líder puede o no venir en este tab. Usamos fallback si existe.
+                                leader: row['Lider'] || row['Líder'] || 'No especificado',
+                                coords: coords
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Error processing row", row, e);
                     }
                 });
 
